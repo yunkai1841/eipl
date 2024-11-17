@@ -52,13 +52,12 @@ class fullBPTTtrainer:
                 x_joint = x_joint.to(self.device)
                 y_joint = y_joint.to(self.device)
 
-            state = None
             yi_list, yv_list = [], []
             dec_pts_list, enc_pts_list = [], []
             self.optimizer.zero_grad(set_to_none=True)
             for t in range(x_img.shape[1] - 1):
-                _yi_hat, _yv_hat, enc_ij, dec_ij, state = self.model(
-                    x_img[:, t], x_joint[:, t], state
+                _yi_hat, _yv_hat, enc_ij, dec_ij = self.model(
+                    x_img[:, t], x_joint[:, t]
                 )
                 yi_list.append(_yi_hat)
                 yv_list.append(_yv_hat)

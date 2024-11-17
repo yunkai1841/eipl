@@ -76,7 +76,7 @@ class SARNN(nn.Module):
 
         rec_in = joint_dim + self.k_dim * 2
         # Use CNN instead of LSTM
-        self.rec = TemporalConvNet(rec_in, rec_dim)
+        self.rec = TemporalConvNet(rec_in, [rec_dim])
 
         # Joint Decoder
         self.decoder_joint = nn.Sequential(
