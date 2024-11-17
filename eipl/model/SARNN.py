@@ -5,7 +5,8 @@
 
 import torch
 import torch.nn as nn
-from eipl.layer import SpatialSoftmax, InverseSpatialSoftmax
+
+from eipl.layer import InverseSpatialSoftmax, SpatialSoftmax
 
 
 class SARNN(nn.Module):
@@ -39,7 +40,7 @@ class SARNN(nn.Module):
         super(SARNN, self).__init__()
 
         self.k_dim = k_dim
-        activation = nn.LeakyReLU(negative_slope=0.3)
+        activation = nn.ReLU()
 
         sub_im_size = [
             im_size[0] - 3 * (kernel_size - 1),
