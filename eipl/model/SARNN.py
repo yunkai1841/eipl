@@ -60,13 +60,11 @@ class SARNN(nn.Module):
         )
 
         # Positional Encoder
-        self.pos_encoder = (
-            SpatialSoftmax(
-                width=sub_im_size[0],
-                height=sub_im_size[1],
-                temperature=self.temperature,
-                normalized=True,
-            ),
+        self.pos_encoder = SpatialSoftmax(
+            width=sub_im_size[0],
+            height=sub_im_size[1],
+            temperature=self.temperature,
+            normalized=True,
         )
 
         rec_in = joint_dim + self.k_dim * 2
