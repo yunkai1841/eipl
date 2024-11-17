@@ -5,7 +5,8 @@
 
 import torch
 import torch.nn as nn
-from eipl.layer import SpatialSoftmax, InverseSpatialSoftmax
+
+from eipl.layer import InverseSpatialSoftmax, SpatialSoftmax
 
 
 class SARNN(nn.Module):
@@ -48,22 +49,6 @@ class SARNN(nn.Module):
         self.temperature = temperature
         self.heatmap_size = heatmap_size
 
-        # Positional Encoder
-        self.pos_encoder = nn.Sequential(
-            nn.Conv2d(3, 16, 3, 1, 0),  # Convolutional layer 1
-            activation,
-            nn.Conv2d(16, 32, 3, 1, 0),  # Convolutional layer 2
-            activation,
-            nn.Conv2d(32, self.k_dim, 3, 1, 0),  # Convolutional layer 3
-            activation,
-            SpatialSoftmax(
-                width=sub_im_size[0],
-                height=sub_im_size[1],
-                temperature=self.temperature,
-                normalized=True,
-            ),  # Spatial Softmax layer
-        )
-
         # Image Encoder
         self.im_encoder = nn.Sequential(
             nn.Conv2d(3, 16, 3, 1, 0),  # Convolutional layer 1
@@ -72,6 +57,16 @@ class SARNN(nn.Module):
             activation,
             nn.Conv2d(32, self.k_dim, 3, 1, 0),  # Convolutional layer 3
             activation,
+        )
+
+        # Positional Encoder
+        self.pos_encoder = (
+            SpatialSoftmax(
+                width=sub_im_size[0],
+                height=sub_im_size[1],
+                temperature=self.temperature,
+                normalized=True,
+            ),
         )
 
         rec_in = joint_dim + self.k_dim * 2
@@ -151,7 +146,7 @@ class SARNN(nn.Module):
 
         # Encode input image
         im_hid = self.im_encoder(xi)
-        enc_pts, _ = self.pos_encoder(xi)
+        enc_pts, _ = self.pos_encoder(im_hid)  # Encode points
 
         # Reshape encoded points and concatenate with input vector
         enc_pts = enc_pts.reshape(-1, self.k_dim * 2)
