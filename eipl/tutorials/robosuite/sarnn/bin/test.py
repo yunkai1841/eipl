@@ -66,7 +66,7 @@ for loop_ct in range(nloop):
     joint_t = torch.Tensor(np.expand_dims(joint_t, 0))
 
     # predict rnn
-    y_image, y_joint, ect_pts, dec_pts, state = model(img_t, joint_t, state)
+    y_image, y_joint, ect_pts, dec_pts = model(img_t, joint_t)
 
     # denormalization
     pred_image = tensor2numpy(y_image[0])

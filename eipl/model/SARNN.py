@@ -6,7 +6,7 @@
 import torch
 import torch.nn as nn
 from eipl.layer import SpatialSoftmax, InverseSpatialSoftmax
-
+from eipl.layer import TemporalConvNet
 
 class SARNN(nn.Module):
     #:: SARNN
@@ -75,7 +75,8 @@ class SARNN(nn.Module):
         )
 
         rec_in = joint_dim + self.k_dim * 2
-        self.rec = nn.LSTMCell(rec_in, rec_dim)  # LSTM cell
+        # Use CNN instead of LSTM
+        self.rec = TemporalConvNet(rec_in, rec_dim)
 
         # Joint Decoder
         self.decoder_joint = nn.Sequential(
@@ -127,7 +128,7 @@ class SARNN(nn.Module):
             nn.init.xavier_uniform_(m.weight)
             nn.init.zeros_(m.bias)
 
-    def forward(self, xi, xv, state=None):
+    def forward(self, xi, xv):
         """
         Forward pass of the SARNN module.
         Predicts the image, joint angle, and attention at the next time based on the image and joint angle at time t.
@@ -157,7 +158,7 @@ class SARNN(nn.Module):
         enc_pts = enc_pts.reshape(-1, self.k_dim * 2)
         hid = torch.cat([enc_pts, xv], -1)
 
-        rnn_hid = self.rec(hid, state)  # LSTM forward pass
+        rnn_hid = self.rec(hid)  # LSTM forward pass
         y_joint = self.decoder_joint(rnn_hid[0])  # Decode joint prediction
         dec_pts = self.decoder_point(rnn_hid[0])  # Decode points
 
