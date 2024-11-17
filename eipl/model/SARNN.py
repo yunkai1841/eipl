@@ -158,9 +158,13 @@ class SARNN(nn.Module):
         enc_pts = enc_pts.reshape(-1, self.k_dim * 2)
         hid = torch.cat([enc_pts, xv], -1)
 
+        # (N, C) -> (N, C, 1)
+        hid = hid.unsqueeze(2)
         rnn_hid = self.rec(hid)  # LSTM forward pass
-        y_joint = self.decoder_joint(rnn_hid[0])  # Decode joint prediction
-        dec_pts = self.decoder_point(rnn_hid[0])  # Decode points
+        rnn_hid = rnn_hid.squeeze(2)
+
+        y_joint = self.decoder_joint(rnn_hid)  # Decode joint prediction
+        dec_pts = self.decoder_point(rnn_hid)  # Decode points
 
         # Reshape decoded points
         dec_pts_in = dec_pts.reshape(-1, self.k_dim, 2)
@@ -168,4 +172,4 @@ class SARNN(nn.Module):
         hid = torch.mul(heatmap, im_hid)  # Multiply heatmap with image feature `im_hid`
 
         y_image = self.decoder_image(hid)  # Decode image
-        return y_image, y_joint, enc_pts, dec_pts, rnn_hid
+        return y_image, y_joint, enc_pts, dec_pts
