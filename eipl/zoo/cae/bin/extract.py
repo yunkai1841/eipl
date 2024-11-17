@@ -5,14 +5,15 @@
 # see https://www.gnu.org/licenses/agpl-3.0.txt
 #
 
-import os
-import torch
 import argparse
-import numpy as np
-from eipl.model import BasicCAE, CAE, BasicCAEBN, CAEBN
-from eipl.data import SampleDownloader
-from eipl.utils import print_info, restore_args, tensor2numpy
+import os
 
+import numpy as np
+import torch
+
+from eipl.data import SampleDownloader
+from eipl.model import CAE, CAEBN, BasicCAE, BasicCAEBN
+from eipl.utils import print_info, restore_args, tensor2numpy
 
 # argument parser
 parser = argparse.ArgumentParser()
@@ -50,11 +51,7 @@ for data_type in ["train", "test"]:
         data_type, params["vmin"], params["vmax"]
     )
     images = torch.tensor(images)
-    joint_bounds = np.load(
-        os.path.join(
-            os.path.expanduser("~"), ".cache/eipl/airec/grasp_bottle/joint_bounds.npy"
-        )
-    )
+    joint_bounds = np.load(".cache/eipl/airec/grasp_bottle/joint_bounds.npy")
 
     # extract image feature
     N = images.shape[0]

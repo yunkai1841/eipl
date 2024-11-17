@@ -5,17 +5,17 @@
 # see https://www.gnu.org/licenses/agpl-3.0.txt
 #
 
-import os
-import torch
 import argparse
-import numpy as np
-import matplotlib.pylab as plt
-import matplotlib.animation as anim
-from eipl.model import BasicCAE, CAE, BasicCAEBN, CAEBN
-from eipl.data import SampleDownloader, WeightDownloader
-from eipl.utils import normalization, deprocess_img, restore_args
-from eipl.utils import tensor2numpy
+import os
 
+import matplotlib.animation as anim
+import matplotlib.pylab as plt
+import numpy as np
+import torch
+
+from eipl.data import SampleDownloader, WeightDownloader
+from eipl.model import CAE, CAEBN, BasicCAE, BasicCAEBN
+from eipl.utils import deprocess_img, normalization, restore_args, tensor2numpy
 
 # argument parser
 parser = argparse.ArgumentParser()
@@ -30,9 +30,7 @@ assert args.filename or args.pretrained, "Please set filename or pretrained"
 # load pretrained weight
 if args.pretrained:
     WeightDownloader("airec", "grasp_bottle")
-    args.filename = os.path.join(
-        os.path.expanduser("~"), ".cache/eipl/airec/grasp_bottle/weights/CAEBN/model.pth"
-    )
+    args.filename = ".cache/eipl/airec/grasp_bottle/weights/CAEBN/model.pth"
 
 # restore parameters
 dir_name = os.path.split(args.filename)[0]

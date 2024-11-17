@@ -5,9 +5,12 @@
 
 import os
 import tarfile
+
 import gdown
 import numpy as np
+
 from eipl.utils import normalization
+
 from .data_dict import data_dict
 
 
@@ -15,7 +18,7 @@ class Downloader:
     def __init__(self, robot, task):
         self.robot = robot
         self.task = task
-        self.root_dir = os.path.join(os.path.expanduser("~"), ".cache/eipl/", robot)
+        self.root_dir = os.path.join(".cache/eipl/", robot)
 
     def _download_tar_files(self, url):
         for _url in url:

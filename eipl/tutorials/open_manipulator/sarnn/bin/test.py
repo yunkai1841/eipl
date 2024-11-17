@@ -30,9 +30,7 @@ assert args.filename or args.pretrained, "Please set filename or pretrained"
 # load pretrained weight
 if args.pretrained:
     WeightDownloader("om", "grasp_cube")
-    args.filename = os.path.join(
-        os.path.expanduser("~"), ".cache/eipl/om/grasp_cube/weights/SARNN/model.pth"
-    )
+    args.filename = ".cache/eipl/om/grasp_cube/weights/SARNN/model.pth"
 
 # restore parameters
 dir_name = os.path.split(args.filename)[0]
@@ -45,9 +43,7 @@ grasp_data = SampleDownloader("om", "grasp_cube", img_format="HWC")
 _images, _joints = grasp_data.load_raw_data("test")
 images = _images[idx]
 joints = _joints[idx]
-joint_bounds = np.load(
-    os.path.join(os.path.expanduser("~"), ".cache/eipl/om/grasp_cube/joint_bounds.npy")
-)
+joint_bounds = np.load(".cache/eipl/om/grasp_cube/joint_bounds.npy")
 print(
     "images shape:{}, min={}, max={}".format(images.shape, images.min(), images.max())
 )
