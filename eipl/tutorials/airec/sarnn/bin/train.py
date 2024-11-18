@@ -3,18 +3,20 @@
 # Released under the MIT License.
 #
 
+import argparse
 import os
 import sys
-import torch
-import numpy as np
-import argparse
-from tqdm import tqdm
-import torch.optim as optim
 from collections import OrderedDict
+
+import numpy as np
+import torch
+import torch.optim as optim
 from torch.utils.tensorboard import SummaryWriter
-from eipl.model import SARNN
+from tqdm import tqdm
+
 from eipl.data import MultimodalDataset, SampleDownloader
-from eipl.utils import EarlyStopping, check_args, set_logdir, resize_img
+from eipl.model import SARNN
+from eipl.utils import EarlyStopping, check_args, resize_img, set_logdir
 
 # load own library
 sys.path.append("./libs/")
@@ -96,7 +98,9 @@ optimizer = optim.Adam(model.parameters(), eps=1e-07)
 
 # load trainer/tester class
 loss_weights = [args.img_loss, args.joint_loss, args.pt_loss]
-trainer = fullBPTTtrainer(model, optimizer, loss_weights=loss_weights, device=device)
+trainer = fullBPTTtrainer(
+    model, optimizer, rec_dim=args.rec_dim, loss_weights=loss_weights, device=device
+)
 
 ### training main
 log_dir_path = set_logdir("./" + args.log_dir, args.tag)

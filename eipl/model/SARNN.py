@@ -5,8 +5,9 @@
 
 import torch
 import torch.nn as nn
-from eipl.layer import SpatialSoftmax, InverseSpatialSoftmax
-from eipl.layer import TemporalConvNet
+
+from eipl.layer import InverseSpatialSoftmax, SpatialSoftmax, TemporalConvNet
+
 
 class SARNN(nn.Module):
     #:: SARNN
@@ -74,7 +75,7 @@ class SARNN(nn.Module):
             activation,
         )
 
-        rec_in = joint_dim + self.k_dim * 2
+        rec_in = joint_dim + self.k_dim * 2 + rec_dim
         # Use CNN instead of LSTM
         self.rec = TemporalConvNet(rec_in, [rec_dim])
 
@@ -128,7 +129,7 @@ class SARNN(nn.Module):
             nn.init.xavier_uniform_(m.weight)
             nn.init.zeros_(m.bias)
 
-    def forward(self, xi, xv):
+    def forward(self, xi, xv, state):
         """
         Forward pass of the SARNN module.
         Predicts the image, joint angle, and attention at the next time based on the image and joint angle at time t.
@@ -156,7 +157,7 @@ class SARNN(nn.Module):
 
         # Reshape encoded points and concatenate with input vector
         enc_pts = enc_pts.reshape(-1, self.k_dim * 2)
-        hid = torch.cat([enc_pts, xv], -1)
+        hid = torch.cat([enc_pts, xv, state], -1)
 
         # (N, C) -> (N, C, 1)
         hid = hid.unsqueeze(2)
@@ -172,4 +173,4 @@ class SARNN(nn.Module):
         hid = torch.mul(heatmap, im_hid)  # Multiply heatmap with image feature `im_hid`
 
         y_image = self.decoder_image(hid)  # Decode image
-        return y_image, y_joint, enc_pts, dec_pts
+        return y_image, y_joint, enc_pts, dec_pts, rnn_hid

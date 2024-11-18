@@ -5,6 +5,7 @@
 
 import torch
 import torch.nn as nn
+
 from eipl.utils import LossScheduler
 
 
@@ -19,12 +20,15 @@ class fullBPTTtrainer:
         input_param (float): input parameter of sequential generation. 1.0 means open mode.
     """
 
-    def __init__(self, model, optimizer, loss_weights=[1.0, 1.0], device="cpu"):
+    def __init__(
+        self, model, optimizer, loss_weights=[1.0, 1.0], rec_dim=50, device="cpu"
+    ):
         self.device = device
         self.optimizer = optimizer
         self.loss_weights = loss_weights
         self.scheduler = LossScheduler(decay_end=1000, curve_name="s")
         self.model = model.to(self.device)
+        self.rec_dim = rec_dim
 
     def save(self, epoch, loss, savename):
         torch.save(
@@ -55,9 +59,10 @@ class fullBPTTtrainer:
             yi_list, yv_list = [], []
             dec_pts_list, enc_pts_list = [], []
             self.optimizer.zero_grad(set_to_none=True)
+            state = torch.zeros((x_img.shape[0], self.rec_dim)).to(self.device)
             for t in range(x_img.shape[1] - 1):
-                _yi_hat, _yv_hat, enc_ij, dec_ij = self.model(
-                    x_img[:, t], x_joint[:, t]
+                _yi_hat, _yv_hat, enc_ij, dec_ij, state = self.model(
+                    x_img[:, t], x_joint[:, t], state
                 )
                 yi_list.append(_yi_hat)
                 yv_list.append(_yv_hat)
