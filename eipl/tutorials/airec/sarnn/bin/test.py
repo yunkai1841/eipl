@@ -83,7 +83,7 @@ model.eval()
 img_size = 128
 image_list, joint_list = [], []
 ect_pts_list, dec_pts_list = [], []
-state = None
+state = torch.zeros(1, params["rec_dim"])
 nloop = len(images)
 for loop_ct in range(nloop):
     # load data and normalization
@@ -102,7 +102,7 @@ for loop_ct in range(nloop):
         joint_t = y_joint
 
     # predict rnn
-    y_image, y_joint, ect_pts, dec_pts = model(img_t, joint_t)
+    y_image, y_joint, ect_pts, dec_pts, state = model(img_t, joint_t, state)
 
     # denormalization
     pred_image = tensor2numpy(y_image[0])
